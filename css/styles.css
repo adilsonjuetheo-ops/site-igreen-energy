@@ -1867,3 +1867,88 @@ body.modal-open {
   font-size: 0.92rem;
   line-height: 1.7;
 }
+
+/* ===================================================================
+   ANIMAÇÃO DO HERO
+   Tudo aqui é decorativo. Sob prefers-reduced-motion nada anima e a
+   ilustração permanece exatamente como está no quadro inicial.
+   =================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+
+  /* --- Entrada escalonada dos elementos do hero ---------------------
+     O hero já está visível no carregamento, então a animação dispara
+     direto, sem depender do IntersectionObserver usado nas outras seções. */
+  .hero-in {
+    opacity: 0;
+    transform: translateY(18px);
+    animation: hero-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: var(--in-delay, 0s);
+  }
+
+  /* --- Fluxo de energia dos painéis até o sol -----------------------
+     O tracejado caminha no sentido do traçado (painel -> sol). O valor de
+     --dash-loop é a soma do padrão do stroke-dasharray multiplicada por 2,
+     para o laço fechar sem salto visível. */
+  .energy-flow {
+    animation: energy-flow var(--flow-time, 3s) linear infinite;
+  }
+
+  /* As ondas secundárias não tinham tracejado no desenho original. */
+  .energy-flow-soft {
+    stroke-dasharray: 5 6;
+  }
+
+  /* --- Fótons pulsando ao longo do percurso ------------------------- */
+  .energy-node {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: node-pulse 2.4s ease-in-out infinite;
+    animation-delay: var(--pulse-delay, 0s);
+  }
+
+  /* --- Sol respirando ---------------------------------------------- */
+  .sun-glow {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: sun-breathe 6s ease-in-out infinite;
+  }
+
+  .sun-core {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: sun-breathe 6s ease-in-out infinite reverse;
+  }
+
+  .sun-rays {
+    animation: rays-shimmer 8s ease-in-out infinite;
+  }
+}
+
+@keyframes hero-in {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes energy-flow {
+  to {
+    stroke-dashoffset: var(--dash-loop, -24);
+  }
+}
+
+@keyframes node-pulse {
+  0%, 100% { transform: scale(1);    opacity: 0.55; }
+  50%      { transform: scale(1.65); opacity: 1; }
+}
+
+@keyframes sun-breathe {
+  0%, 100% { transform: scale(1);    opacity: 0.9; }
+  50%      { transform: scale(1.06); opacity: 1; }
+}
+
+@keyframes rays-shimmer {
+  0%, 100% { opacity: 0.65; }
+  50%      { opacity: 1; }
+}
