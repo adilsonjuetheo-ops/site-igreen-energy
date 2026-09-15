@@ -1,5 +1,15 @@
+/* iGreen Energy — interações da landing page */
+
+// Percentual de desconto usado na calculadora e nas mensagens.
+const DISCOUNT_RATE = 0.15;
+
+// Número que recebe os leads do formulário.
+const LEAD_WHATSAPP = '5533997315900';
+
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Calculadora Interativa
+  /* ---------------------------------------------------------------
+   * 1. Calculadora Interativa
+   * ------------------------------------------------------------- */
   const billInput = document.getElementById('bill-input');
   const resMonth = document.getElementById('res-month');
   const resYear = document.getElementById('res-year');
@@ -14,25 +24,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function updateCalculation() {
-    const rawValue = parseFloat(billInput.value);
-    const value = isNaN(rawValue) || rawValue < 0 ? 0 : rawValue;
+  // Valor atual da conta informado na calculadora, para reaproveitar no formulário.
+  function currentBillValue() {
+    const raw = parseFloat(billInput.value);
+    return isNaN(raw) || raw < 0 ? 0 : raw;
+  }
 
-    // 15% de desconto
-    const monthlyDiscount = value * 0.15;
-    const annualDiscount = monthlyDiscount * 12;
+  function updateCalculation() {
+    const value = currentBillValue();
+    const monthlyDiscount = value * DISCOUNT_RATE;
 
     resMonth.textContent = formatBRL(monthlyDiscount);
-    resYear.textContent = formatBRL(annualDiscount);
+    resYear.textContent = formatBRL(monthlyDiscount * 12);
 
-    // Atualizar estado visual dos chips rápidos
+    // Destaca o resultado brevemente para sinalizar que o número mudou.
+    [resMonth, resYear].forEach(el => {
+      el.classList.remove('is-updating');
+      // Força o reinício da animação mesmo em alterações consecutivas.
+      void el.offsetWidth;
+      el.classList.add('is-updating');
+    });
+
     chipButtons.forEach(btn => {
       const btnVal = parseFloat(btn.getAttribute('data-val'));
-      if (btnVal === value) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
+      btn.classList.toggle('active', btnVal === value);
+      btn.setAttribute('aria-pressed', btnVal === value ? 'true' : 'false');
     });
   }
 
@@ -40,100 +56,195 @@ document.addEventListener('DOMContentLoaded', () => {
 
   chipButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-      const val = btn.getAttribute('data-val');
-      billInput.value = val;
+      billInput.value = btn.getAttribute('data-val');
       updateCalculation();
     });
   });
 
-  // Executa cálculo inicial com R$ 200 (Economia mês R$ 30,00, ano R$ 360,00)
   updateCalculation();
 
-  // 2. Acordeão de FAQ
+  /* ---------------------------------------------------------------
+   * 2. Acordeão de FAQ
+   * ------------------------------------------------------------- */
   const faqItems = document.querySelectorAll('.faq-item');
   faqItems.forEach(item => {
     const btn = item.querySelector('.faq-btn');
     btn.addEventListener('click', () => {
       const isActive = item.classList.contains('active');
-      // Fechar outros se desejar uma navegação limpa
+
       faqItems.forEach(i => {
-        if (i !== item) {
-          i.classList.remove('active');
-          i.querySelector('.faq-btn').setAttribute('aria-expanded', 'false');
-        }
+        i.classList.remove('active');
+        i.querySelector('.faq-btn').setAttribute('aria-expanded', 'false');
       });
-      // Alternar item atual
-      if (isActive) {
-        item.classList.remove('active');
-        btn.setAttribute('aria-expanded', 'false');
-      } else {
+
+      if (!isActive) {
         item.classList.add('active');
         btn.setAttribute('aria-expanded', 'true');
       }
     });
   });
 
-  // 3. Efeito de Scroll no Header
+  /* ---------------------------------------------------------------
+   * 3. Efeito de Scroll no Header
+   * ------------------------------------------------------------- */
   const headerEl = document.getElementById('header');
   window.addEventListener('scroll', () => {
-    if (window.scrollY > 15) {
-      headerEl.classList.add('scrolled');
-    } else {
-      headerEl.classList.remove('scrolled');
-    }
-  });
+    headerEl.classList.toggle('scrolled', window.scrollY > 15);
+  }, { passive: true });
 
-  // 4. Modal e Toast
+  /* ---------------------------------------------------------------
+   * 4. Modal de cadastro
+   * ------------------------------------------------------------- */
   const modal = document.getElementById('action-modal');
   const modalCloseBtn = document.getElementById('modal-close-btn');
+  const modalHeading = document.getElementById('modal-heading');
   const toast = document.getElementById('toast-element');
   const toastText = document.getElementById('toast-text');
+  const signupForm = document.getElementById('signup-form');
+
+  // Elemento que abriu o modal, para devolver o foco ao fechar.
+  let lastFocusedEl = null;
+  let toastTimer = null;
+
+  const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
   function showToast(msg) {
     toastText.textContent = msg;
     toast.classList.add('show');
-    setTimeout(() => {
-      toast.classList.remove('show');
-    }, 4000);
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 5000);
   }
 
-  function openModal(titleText) {
-    if (titleText) {
-      document.getElementById('modal-heading').textContent = titleText;
-    }
+  function openModal(titleText, trigger) {
+    lastFocusedEl = trigger || document.activeElement;
+    if (titleText) modalHeading.textContent = titleText;
+
     modal.classList.add('open');
+    modal.removeAttribute('aria-hidden');
+    // Impede que o fundo role enquanto o modal está aberto.
+    document.body.classList.add('modal-open');
+
+    const first = modal.querySelector(FOCUSABLE);
+    if (first) first.focus();
   }
 
   function closeModal() {
     modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+    if (lastFocusedEl) lastFocusedEl.focus();
   }
 
   modalCloseBtn.addEventListener('click', closeModal);
+
   modal.addEventListener('click', (e) => {
     if (e.target === modal) closeModal();
   });
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal.classList.contains('open')) {
+    if (!modal.classList.contains('open')) return;
+
+    if (e.key === 'Escape') {
       closeModal();
+      return;
+    }
+
+    // Focus trap: mantém o Tab circulando dentro do modal.
+    if (e.key === 'Tab') {
+      const items = Array.from(modal.querySelectorAll(FOCUSABLE))
+        .filter(el => el.offsetParent !== null);
+      if (!items.length) return;
+
+      const first = items[0];
+      const last = items[items.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
   });
 
-  // Hero: rolagem suave até a calculadora mantendo abertura do link em nova aba
+  // Os CTAs marcados com data-open-modal abrem o formulário em vez de sair do
+  // site. O href original continua no HTML como fallback caso o JS não carregue.
+  document.querySelectorAll('[data-open-modal]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      openModal(el.getAttribute('data-modal-title'), el);
+    });
+  });
+
+  /* ---------------------------------------------------------------
+   * 5. Envio do formulário para o WhatsApp
+   * ------------------------------------------------------------- */
+  signupForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById('modal-name').value.trim();
+    const phone = document.getElementById('modal-phone').value.trim();
+    const stateEl = document.getElementById('modal-state');
+    const distributor = stateEl.options[stateEl.selectedIndex].text;
+
+    const bill = currentBillValue();
+
+    const lines = [
+      'Olá! Quero meu desconto na conta de energia pela iGreen.',
+      '',
+      `Nome: ${name}`,
+      `WhatsApp: ${phone}`,
+      `Distribuidora: ${distributor}`
+    ];
+
+    // Só cita a simulação se a pessoa realmente informou um valor.
+    if (bill > 0) {
+      lines.push(`Conta hoje: ${formatBRL(bill)}/mês`);
+      lines.push(`Economia simulada: ${formatBRL(bill * DISCOUNT_RATE)}/mês`);
+    }
+
+    const url = `https://wa.me/${LEAD_WHATSAPP}?text=${encodeURIComponent(lines.join('\n'))}`;
+
+    closeModal();
+    showToast('Abrindo o WhatsApp com seus dados. É só enviar a mensagem!');
+    signupForm.reset();
+
+    window.open(url, '_blank', 'noopener');
+  });
+
+  /* ---------------------------------------------------------------
+   * 6. Rolagem suave do CTA do hero até a calculadora
+   * ------------------------------------------------------------- */
   const btnHeroSimulate = document.getElementById('btn-hero-simulate');
   if (btnHeroSimulate) {
-    btnHeroSimulate.addEventListener('click', () => {
-      const calcSection = document.getElementById('calculadora');
-      if (calcSection) {
-        calcSection.scrollIntoView({ behavior: 'smooth' });
-      }
+    btnHeroSimulate.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('calculadora').scrollIntoView({ behavior: 'smooth' });
+      // Deixa o campo pronto para digitação depois da rolagem.
+      setTimeout(() => billInput.focus({ preventScroll: true }), 600);
     });
   }
 
-  // Form submission mock
-  window.handleSignupSubmit = function() {
-    closeModal();
-    showToast('Cadastro recebido! Nossa equipe entrará em contato para ativar seus créditos.');
-    window.open('https://green.igreenenergy.com.br/?id=168451', '_blank', 'noopener');
-  };
+  /* ---------------------------------------------------------------
+   * 7. Revelação das seções ao rolar
+   * ------------------------------------------------------------- */
+  const revealEls = document.querySelectorAll('.reveal');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+    // Sem animação: tudo já entra visível.
+    revealEls.forEach(el => el.classList.add('is-visible'));
+  } else {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+
+    revealEls.forEach(el => observer.observe(el));
+  }
 });

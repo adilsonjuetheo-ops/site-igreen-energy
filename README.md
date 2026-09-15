@@ -36,8 +36,9 @@ accordion, depoimentos, modal de cadastro e integração com WhatsApp.
 ```
 .
 ├── index.html          # Marcação completa da página
+├── privacidade.html    # Política de privacidade (LGPD)
 ├── css/styles.css      # Estilos, tokens de tema e responsividade
-├── js/main.js          # Calculadora, FAQ, header, modal e toast
+├── js/main.js          # Calculadora, FAQ, header, modal, envio e scroll reveal
 ├── assets/favicon.svg  # Ícone do site
 ├── Dockerfile          # Imagem nginx para deploy na VPS
 ├── nginx.conf          # Config do servidor (gzip, cache, headers)
@@ -85,7 +86,25 @@ docker run -p 8080:80 igreen-energy
 No Coolify: criar uma aplicação do tipo **Dockerfile** apontando para este
 repositório, porta exposta **80**, e apontar o domínio desejado.
 
-## Links de conversão
+## Fluxo de conversão
 
-- Cadastro: `https://green.igreenenergy.com.br/?id=168451`
-- WhatsApp: `https://wa.me/5533997315900`
+Os CTAs principais abrem o modal de cadastro em vez de mandar o visitante direto
+para fora do site. Ao enviar o formulário, os dados (nome, telefone, distribuidora
+e o valor simulado na calculadora) são montados numa mensagem e abertos no
+WhatsApp do consultor — o lead é capturado antes de qualquer redirecionamento.
+
+O `href` externo continua nos botões como fallback: se o JavaScript não carregar,
+o visitante ainda chega ao site do parceiro.
+
+Não há banco de dados: os dados existem apenas no navegador até o envio da mensagem.
+
+- Consultor (leads): `https://wa.me/5533997315900`
+- Cadastro parceiro: `https://green.igreenenergy.com.br/?id=168451`
+- Percentual de desconto: constante `DISCOUNT_RATE` no topo de `js/main.js`
+
+## Acessibilidade
+
+- Modal com focus trap, retorno de foco ao elemento que o abriu e bloqueio da
+  rolagem de fundo; fecha com `Esc` ou clique no fundo.
+- Estados de foco visíveis em todos os elementos interativos (`:focus-visible`).
+- Animações de entrada respeitam `prefers-reduced-motion`.

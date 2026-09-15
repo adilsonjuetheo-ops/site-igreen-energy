@@ -1322,12 +1322,18 @@ a.final-badge:hover {
   z-index: 200;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease;
+  /* visibility (e não só opacity) tira o formulário da ordem de tabulação e da
+     árvore de acessibilidade enquanto o modal está fechado. Só com opacity, os
+     campos invisíveis continuavam alcançáveis pelo Tab. */
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0s linear 0.25s;
 }
 
 .modal-backdrop.open {
   opacity: 1;
   pointer-events: auto;
+  visibility: visible;
+  transition: opacity 0.25s ease, visibility 0s;
 }
 
 .modal-window {
@@ -1482,5 +1488,348 @@ a.final-badge:hover {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ===================================================================
+   MELHORIAS DE UI/UX
+   =================================================================== */
+
+/* -------------------------------------------------------------------
+   Foco visível global
+   Regra de rede: qualquer elemento interativo que não tenha um estilo
+   de foco próprio mais específico cai aqui, em vez de ficar sem indicação.
+   ------------------------------------------------------------------- */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--brand-light-green);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Não exibe o anel em clique de mouse, só em navegação por teclado. */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* -------------------------------------------------------------------
+   Revelação das seções ao rolar
+   O estado final (.is-visible) é aplicado pelo JS. Se o JS não rodar,
+   .reveal nunca esconde nada — o conteúdo continua legível.
+   ------------------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* -------------------------------------------------------------------
+   Calculadora: destaque ao recalcular
+   ------------------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .is-updating {
+    animation: value-pop 0.45s ease;
+  }
+}
+
+@keyframes value-pop {
+  0%   { transform: scale(1);    color: var(--brand-light-green); }
+  45%  { transform: scale(1.06); color: var(--brand-light-green); }
+  100% { transform: scale(1); }
+}
+
+/* -------------------------------------------------------------------
+   Modal: bloqueio de rolagem do fundo e campos do formulário
+   ------------------------------------------------------------------- */
+body.modal-open {
+  overflow: hidden;
+}
+
+.modal-head {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.modal-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: rgba(11, 110, 79, 0.25);
+  border: 1px solid var(--border-emerald);
+  color: var(--brand-light-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+}
+
+.modal-title {
+  font-size: 1.45rem;
+  font-weight: 800;
+  margin: 0 0 6px;
+  color: var(--text-white);
+}
+
+.modal-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-gray);
+  margin: 0;
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.field-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-gray);
+  margin-bottom: 6px;
+}
+
+.field-control {
+  width: 100%;
+  height: 48px;
+  background: var(--bg-dark-card);
+  color: var(--text-white);
+  border: 1px solid var(--border-dark-card);
+  border-radius: 10px;
+  padding: 0 14px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field-control::placeholder {
+  color: var(--text-muted);
+}
+
+.field-control:hover {
+  border-color: var(--border-emerald);
+}
+
+.field-control:focus {
+  outline: none;
+  border-color: var(--brand-accent);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.22);
+}
+
+/* Só sinaliza erro depois que a pessoa mexeu no campo, nunca em campo intocado. */
+.field-control:user-invalid {
+  border-color: #F87171;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.18);
+}
+
+.field-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.field-consent input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: var(--brand-accent);
+  cursor: pointer;
+}
+
+.field-consent label {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-gray);
+  cursor: pointer;
+}
+
+.field-consent a {
+  color: var(--brand-light-green);
+  text-decoration: underline;
+}
+
+.modal-submit {
+  width: 100%;
+  justify-content: center;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.modal-note {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 12px 0 0;
+}
+
+/* -------------------------------------------------------------------
+   Rodapé: informações legais
+   ------------------------------------------------------------------- */
+.footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 18px;
+  margin-top: 14px;
+}
+
+.footer-legal a {
+  color: var(--text-gray);
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-legal a:hover {
+  color: var(--brand-light-green);
+  text-decoration: underline;
+}
+
+.footer-company {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 10px 0 0;
+  line-height: 1.6;
+}
+
+/* -------------------------------------------------------------------
+   Breakpoints intermediários
+   O layout original só tratava 768px e 640px; entre tablet e desktop
+   grande as grades ficavam com colunas largas demais.
+   ------------------------------------------------------------------- */
+@media (min-width: 1440px) {
+  .shell-container {
+    max-width: 1240px;
+  }
+}
+
+/* Faixa fechada de propósito: abaixo de 769px o bloco anterior já coloca
+   estas grades em coluna única, e como estas regras vêm depois no arquivo,
+   um "max-width" solto sobrescreveria o layout do celular. */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .steps-grid,
+  .features-grid,
+  .testimonials-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 641px) and (max-width: 900px) {
+  .benefits-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Alvos de toque confortáveis no celular (mínimo de 44px). */
+@media (max-width: 640px) {
+  .chip-btn,
+  .faq-btn,
+  .btn-nav-cadastrar {
+    min-height: 44px;
+  }
+
+  .footer-legal {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/* -------------------------------------------------------------------
+   Páginas de texto legal (política de privacidade)
+   ------------------------------------------------------------------- */
+.legal-page {
+  padding: 120px 0 72px;
+  background: var(--bg-dark-base);
+}
+
+.legal-container {
+  max-width: 760px;
+}
+
+.legal-title {
+  font-size: clamp(1.9rem, 5vw, 2.6rem);
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 0 0 8px;
+  color: var(--text-white);
+}
+
+.legal-updated {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0 0 28px;
+}
+
+.legal-lead {
+  font-size: 1.05rem;
+  color: var(--text-gray);
+  border-left: 3px solid var(--brand-accent);
+  padding-left: 16px;
+  margin: 0 0 40px;
+}
+
+.legal-section {
+  margin-bottom: 34px;
+}
+
+.legal-section h2 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--brand-light-green);
+  margin: 0 0 12px;
+}
+
+.legal-section p {
+  color: var(--text-gray);
+  margin: 0 0 14px;
+  font-size: 0.98rem;
+}
+
+.legal-section ul {
+  color: var(--text-gray);
+  margin: 0 0 14px;
+  padding-left: 22px;
+  font-size: 0.98rem;
+}
+
+.legal-section li {
+  margin-bottom: 8px;
+}
+
+.legal-section strong {
+  color: var(--text-white);
+}
+
+.legal-section a {
+  color: var(--brand-light-green);
+  text-decoration: underline;
+}
+
+.legal-back {
+  margin-top: 44px;
+  text-align: center;
+}
+
+.legal-back .cta-btn-primary {
+  text-decoration: none;
+}
+
+@media (max-width: 640px) {
+  .legal-page {
+    padding: 100px 0 56px;
   }
 }
