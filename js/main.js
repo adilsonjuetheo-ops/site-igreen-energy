@@ -6,7 +6,40 @@ const DISCOUNT_RATE = 0.15;
 // Número que recebe os leads do formulário.
 const LEAD_WHATSAPP = '5533997315900';
 
+// Medição de audiência (GA4). Basta preencher o ID no formato "G-XXXXXXXXXX".
+// Enquanto estiver vazio, nenhum script de terceiro é carregado e nenhum cookie
+// é criado — que é exatamente o que privacidade.html declara hoje. Ao ativar,
+// atualizar a seção 5 daquela página ANTES de publicar.
+const GA_MEASUREMENT_ID = '';
+
+/**
+ * Registra um evento de conversão. Vira uma função vazia enquanto não houver
+ * ID configurado, então os pontos de medição já podem ficar espalhados pelo
+ * código sem efeito nenhum.
+ */
+function track(eventName, params) {
+  if (!GA_MEASUREMENT_ID) return;
+  if (typeof window.gtag !== 'function') return;
+  window.gtag('event', eventName, params || {});
+}
+
+function loadAnalytics() {
+  if (!GA_MEASUREMENT_ID) return;
+
+  const s = document.createElement('script');
+  s.async = true;
+  s.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+  document.head.appendChild(s);
+
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { window.dataLayer.push(arguments); };
+  window.gtag('js', new Date());
+  window.gtag('config', GA_MEASUREMENT_ID, { anonymize_ip: true });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  loadAnalytics();
+
   /* ---------------------------------------------------------------
    * 1. Calculadora Interativa
    * ------------------------------------------------------------- */
@@ -52,7 +85,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  billInput.addEventListener('input', updateCalculation);
+  let calcTracked = false;
+  billInput.addEventListener('input', () => {
+    updateCalculation();
+    if (!calcTracked) {
+      calcTracked = true;
+      track('usou_calculadora');
+    }
+  });
 
   chipButtons.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -174,6 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
     el.addEventListener('click', (e) => {
       e.preventDefault();
       openModal(el.getAttribute('data-modal-title'), el);
+      track('abriu_formulario', { origem: el.id || 'sem-id' });
     });
   });
 
@@ -206,11 +247,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const url = `https://wa.me/${LEAD_WHATSAPP}?text=${encodeURIComponent(lines.join('\n'))}`;
 
+    track('gerou_lead', {
+      distribuidora: distributor,
+      valor_conta: bill,
+      simulou: bill > 0
+    });
+
     closeModal();
     showToast('Abrindo o WhatsApp com seus dados. É só enviar a mensagem!');
     signupForm.reset();
 
     window.open(url, '_blank', 'noopener');
+  });
+
+  // Cliques diretos no WhatsApp (botão flutuante, rodapé, CTA final), que são
+  // conversões que não passam pelo formulário.
+  document.querySelectorAll('a[href*="wa.me/"]').forEach(el => {
+    el.addEventListener('click', () => {
+      track('clicou_whatsapp', { origem: el.className || 'sem-classe' });
+    });
   });
 
   /* ---------------------------------------------------------------

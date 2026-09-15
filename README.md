@@ -102,6 +102,37 @@ Não há banco de dados: os dados existem apenas no navegador até o envio da me
 - Cadastro parceiro: `https://green.igreenenergy.com.br/?id=168451`
 - Percentual de desconto: constante `DISCOUNT_RATE` no topo de `js/main.js`
 
+## Pendências de conteúdo
+
+Dois blocos estão **comentados no HTML** aguardando dados reais. Enquanto
+comentados, nada falso vai ao ar — basta preencher e descomentar:
+
+| Onde | O que falta |
+|---|---|
+| `index.html`, rodapé | Razão social, CNPJ e endereço |
+| `privacidade.html`, seção 1 | Os mesmos dados, como controlador |
+
+## Medição de audiência
+
+Desligada por padrão. Para ativar, preencha o ID no topo de `js/main.js`:
+
+```js
+const GA_MEASUREMENT_ID = 'G-XXXXXXXXXX';
+```
+
+Com o campo vazio nenhum script de terceiro é carregado e nenhum cookie é
+criado — é o estado que a política de privacidade declara hoje. **Ao ativar,
+atualize a seção 5 de `privacidade.html` antes de publicar.**
+
+Eventos já instrumentados:
+
+| Evento | Quando dispara |
+|---|---|
+| `usou_calculadora` | Primeira digitação na calculadora (uma vez por visita) |
+| `abriu_formulario` | Clique num CTA que abre o modal, com o id de origem |
+| `gerou_lead` | Envio do formulário, com distribuidora e valor da conta |
+| `clicou_whatsapp` | Clique direto em qualquer link `wa.me` |
+
 ## Acessibilidade
 
 - Modal com focus trap, retorno de foco ao elemento que o abriu e bloqueio da
