@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://adilsonjuetheo-ops.github.io/site-igreen-energy/sitemap.xml
