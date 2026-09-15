@@ -102,15 +102,18 @@ Não há banco de dados: os dados existem apenas no navegador até o envio da me
 - Cadastro parceiro: `https://green.igreenenergy.com.br/?id=168451`
 - Percentual de desconto: constante `DISCOUNT_RATE` no topo de `js/main.js`
 
-## Pendências de conteúdo
+## Dados cadastrais exibidos
 
-Dois blocos estão **comentados no HTML** aguardando dados reais. Enquanto
-comentados, nada falso vai ao ar — basta preencher e descomentar:
+| Registro | CNPJ | Papel |
+|---|---|---|
+| iGreen Energia Comércio e Serviço S.A. | 44.159.238/0001-30 | Empresa representada (matriz, Uberlândia/MG, desde 08/11/2021) |
+| Consórcio iGreen Energy | 62.298.581/0001-47 | Geração de energia elétrica |
 
-| Onde | O que falta |
-|---|---|
-| `index.html`, rodapé | Razão social, CNPJ e endereço |
-| `privacidade.html`, seção 1 | Os mesmos dados, como controlador |
+Aparecem no rodapé de `index.html` e na seção 1 de `privacidade.html`.
+
+A política distingue os papéis de propósito: os dados do formulário vão para o
+**consultor representante**, não para a iGreen. Quem trata o lead no primeiro
+momento é o consultor, e é o contato dele que responde por pedidos da LGPD.
 
 ## Medição de audiência
 
