@@ -108,26 +108,22 @@ body {
 }
 
 /* Marca iGreenSol.
-   A logo original foi desenhada para fundo branco, onde o "reen" é verde-escuro
-   (#166534). Sobre o azul-petróleo do site esse tom quase some, então aqui ele é
-   clareado. O laranja se mantém, porque contrasta bem nos dois fundos. */
+   Na logo original o símbolo não é um ícone solto ao lado do texto: a folha fica
+   dentro do "G" e a rosca da lâmpada desce por baixo das letras, de modo que o
+   próprio "G" faz as vezes do bulbo. Por isso o SVG é sobreposto ao texto, e não
+   colocado antes dele.
+
+   O verde-escuro do "reen" (#166534 no original) foi feito para fundo branco;
+   sobre o azul-petróleo do site ele quase some, então aqui é clareado. */
 :root {
   --logo-i: #4ADE80;
   --logo-g: #F97316;
   --logo-reen: #22C55E;
   --logo-sol: #F97316;
   --logo-energy: #34D399;
-  --logo-leaf-a: #22C55E;
+  --logo-leaf-a: #16A34A;
   --logo-leaf-b: #4ADE80;
-}
-
-.brand-mark {
-  width: 30px;
-  height: 34px;
-  flex-shrink: 0;
-  margin-right: 9px;
-  color: var(--logo-g);
-  overflow: visible;
+  --logo-base: #22C55E;
 }
 
 .brand-word {
@@ -136,8 +132,12 @@ body {
   line-height: 1;
 }
 
+/* Âncora do posicionamento da lâmpada. O padding inferior abre espaço para a
+   rosca, que desce abaixo da linha de base das letras. */
 .brand-name {
+  position: relative;
   white-space: nowrap;
+  padding-bottom: 0.34em;
 }
 
 .brand-logo .brand-i     { color: var(--logo-i); }
@@ -145,14 +145,25 @@ body {
 .brand-logo .brand-reen  { color: var(--logo-reen); }
 .brand-logo .brand-sol   { color: var(--logo-sol); }
 
+/* Medidas em em para a lâmpada acompanhar o tamanho da fonte da marca. */
+.brand-bulb {
+  position: absolute;
+  left: 0.30em;
+  top: 0.12em;
+  width: 0.78em;
+  height: 1.20em;
+  overflow: visible;
+  pointer-events: none;
+}
+
 /* "energy" alinhado à direita, sob o "Sol", como no desenho original. */
 .brand-logo .brand-energy {
   color: var(--logo-energy);
   align-self: flex-end;
-  font-size: 0.52em;
+  font-size: 0.5em;
   font-weight: 700;
-  letter-spacing: 0.01em;
-  margin-top: 0.18em;
+  letter-spacing: 0.02em;
+  margin-top: 0.1em;
 }
 
 /* Top button - CTA Primário */
