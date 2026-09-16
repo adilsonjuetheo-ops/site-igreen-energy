@@ -268,6 +268,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Entradas no grupo da comunidade. O seletor de clicou_whatsapp não pega
+  // estas, porque ele procura por "wa.me/" e o convite de grupo usa
+  // chat.whatsapp.com.
+  document.querySelectorAll('a[href*="chat.whatsapp.com"]').forEach(el => {
+    el.addEventListener('click', () => {
+      track('clicou_comunidade', { origem: el.id || 'sem-id' });
+    });
+  });
+
   // Saídas para o iGreen Club, que é um funil separado do cadastro.
   document.querySelectorAll('a[href*="club.igreenenergy.com.br"]').forEach(el => {
     el.addEventListener('click', () => {
