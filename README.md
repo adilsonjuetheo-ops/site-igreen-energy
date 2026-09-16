@@ -99,7 +99,8 @@ o visitante ainda chega ao site do parceiro.
 Não há banco de dados: os dados existem apenas no navegador até o envio da mensagem.
 
 - Consultor (leads): `https://wa.me/5533997315900`
-- Cadastro parceiro: `https://green.igreenenergy.com.br/?id=168451`
+- Cadastro parceiro (fallback sem JS): `https://green.igreenenergy.com.br/?id=168451`
+- iGreen Club: `https://club.igreenenergy.com.br/?ref=82a1be9c-392d-4364-9ffb-b93e64669b71`
 - Percentual de desconto: constante `DISCOUNT_RATE` no topo de `js/main.js`
 
 ## Dados cadastrais exibidos
@@ -135,6 +136,7 @@ Eventos já instrumentados:
 | `abriu_formulario` | Clique num CTA que abre o modal, com o id de origem |
 | `gerou_lead` | Envio do formulário, com distribuidora e valor da conta |
 | `clicou_whatsapp` | Clique direto em qualquer link `wa.me` |
+| `clicou_club` | Saída para o iGreen Club, que é um funil separado |
 
 ## Acessibilidade
 

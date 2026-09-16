@@ -268,6 +268,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Saídas para o iGreen Club, que é um funil separado do cadastro.
+  document.querySelectorAll('a[href*="club.igreenenergy.com.br"]').forEach(el => {
+    el.addEventListener('click', () => {
+      track('clicou_club', { origem: el.id || 'sem-id' });
+    });
+  });
+
   /* ---------------------------------------------------------------
    * 6. Rolagem suave do CTA do hero até a calculadora
    * ------------------------------------------------------------- */
