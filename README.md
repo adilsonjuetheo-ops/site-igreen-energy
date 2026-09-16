@@ -140,6 +140,21 @@ Eventos já instrumentados:
 | `clicou_club` | Saída para o iGreen Club, que é um funil separado |
 | `clicou_cadastro_direto` | Saída direta ao cadastro sem passar pelo formulário |
 
+## Cache de estáticos
+
+`nginx.conf` serve `css/` e `js/` com `Cache-Control: immutable` por 30 dias. Por
+isso as duas páginas HTML referenciam esses arquivos com um parâmetro de versão:
+
+```html
+<link rel="stylesheet" href="css/styles.css?v=2026091501">
+<script src="js/main.js?v=2026091501"></script>
+```
+
+**Ao alterar qualquer coisa em `css/` ou `js/`, incremente esse `?v=` nas duas
+páginas.** Sem isso, quem já visitou o site continua com a versão antiga em cache
+e passa a ver HTML novo com CSS velho — o que quebra o layout em vez de apenas
+deixá-lo desatualizado.
+
 ## Acessibilidade
 
 - Modal com focus trap, retorno de foco ao elemento que o abriu e bloqueio da
