@@ -39,7 +39,7 @@ accordion, depoimentos, modal de cadastro e integração com WhatsApp.
 ├── privacidade.html    # Política de privacidade (LGPD)
 ├── css/styles.css      # Estilos, tokens de tema e responsividade
 ├── js/main.js          # Calculadora, FAQ, header, modal, envio e scroll reveal
-├── assets/favicon.svg  # Ícone do site
+├── assets/             # Logo, favicon, imagem social, vídeo e capa
 ├── Dockerfile          # Imagem nginx para deploy na VPS
 ├── nginx.conf          # Config do servidor (gzip, cache, headers)
 ├── robots.txt
@@ -145,6 +145,8 @@ Eventos já instrumentados:
 | `gerou_lead` | Envio do formulário, com distribuidora e valor da conta |
 | `clicou_whatsapp` | Clique direto em qualquer link `wa.me` |
 | `clicou_comunidade` | Entrada no grupo da comunidade (`chat.whatsapp.com`) |
+| `deu_play_video` | Primeiro play no vídeo institucional |
+| `video_progresso` | Marcos de 25%, 50%, 75% e 100% assistidos |
 | `clicou_club` | Saída para o iGreen Club, que é um funil separado |
 | `clicou_cadastro_direto` | Saída direta ao cadastro sem passar pelo formulário |
 

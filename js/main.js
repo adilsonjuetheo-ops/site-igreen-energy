@@ -268,6 +268,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  /* ---------------------------------------------------------------
+   * Vídeo institucional
+   * ------------------------------------------------------------- */
+  const video = document.getElementById('video-institucional');
+  if (video) {
+    // Só o primeiro play conta, senão pausar e retomar inflaria a métrica.
+    let playRegistrado = false;
+    video.addEventListener('play', () => {
+      if (playRegistrado) return;
+      playRegistrado = true;
+      track('deu_play_video');
+    });
+
+    // Marcos de audiência: mostram quem assistiu de verdade, não só quem clicou.
+    const marcos = [25, 50, 75, 100];
+    const vistos = new Set();
+    video.addEventListener('timeupdate', () => {
+      if (!video.duration) return;
+      const pct = (video.currentTime / video.duration) * 100;
+      marcos.forEach(m => {
+        if (pct >= m && !vistos.has(m)) {
+          vistos.add(m);
+          track('video_progresso', { percentual: m });
+        }
+      });
+    });
+  }
+
   // Entradas no grupo da comunidade. O seletor de clicou_whatsapp não pega
   // estas, porque ele procura por "wa.me/" e o convite de grupo usa
   // chat.whatsapp.com.

@@ -29,7 +29,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=2026091603">
+  <link rel="stylesheet" href="css/styles.css?v=2026091604">
 </head>
 <body>
 
@@ -38,7 +38,7 @@
     <div class="shell-container">
       <nav class="header-nav" aria-label="Navegação Principal">
         <a href="#" class="brand-logo">
-          <img src="assets/logo-dark.png?v=2026091603" width="583" height="150"
+          <img src="assets/logo-dark.png?v=2026091604" width="583" height="150"
                alt="iGreenSol energy" class="brand-img">
         </a>
 
@@ -470,6 +470,34 @@
             <polyline points="9 22 9 12 15 12 15 22"></polyline>
           </svg>
           <span>Funciona para CPF e CNPJ: casas, aptos e empresas.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- VÍDEO -->
+    <section class="video-section">
+      <div class="shell-container">
+        <div class="section-head reveal">
+          <span class="section-tag">Veja como funciona</span>
+          <h2 class="section-title">Entenda em menos de 2 minutos</h2>
+          <p class="section-desc">Assista e veja por que dá para economizar sem instalar nada.</p>
+        </div>
+
+        <!-- preload="none" evita baixar os 7,7 MB de quem nunca dá play.
+             O poster carrega no lugar e o vídeo só é buscado ao clicar. -->
+        <div class="video-frame reveal">
+          <video
+            id="video-institucional"
+            class="video-player"
+            controls
+            preload="none"
+            playsinline
+            poster="assets/igreen-capa.jpg?v=2026091604"
+            width="1024" height="576">
+            <source src="assets/igreen.mp4?v=2026091604" type="video/mp4">
+            Seu navegador não consegue exibir este vídeo.
+            <a href="assets/igreen.mp4">Baixe o arquivo</a> para assistir.
+          </video>
         </div>
       </div>
     </section>
@@ -953,6 +981,6 @@
     </svg>
     <span id="toast-text">Tudo pronto! Entraremos em contato via WhatsApp.</span>
   </div>
-  <script src="js/main.js?v=2026091603"></script>
+  <script src="js/main.js?v=2026091604"></script>
 </body>
 </html>
