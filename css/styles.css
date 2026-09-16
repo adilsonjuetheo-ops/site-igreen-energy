@@ -1423,9 +1423,6 @@ a.final-badge:hover {
     height: auto;
     padding: 6px 0;
   }
-  .brand-logo {
-    font-size: clamp(1.125rem, 4.8vw, 1.25rem);
-  }
   .calculator-box {
     padding: 24px 16px;
   }
@@ -1964,4 +1961,34 @@ body.modal-open {
 @keyframes rays-shimmer {
   0%, 100% { opacity: 0.65; }
   50%      { opacity: 1; }
+}
+
+/* -------------------------------------------------------------------
+   Telas muito estreitas (iPhone SE e Androids antigos, 320-400px)
+   ------------------------------------------------------------------- */
+
+/* Os três selos do hero ficam em linha única forçada por flex-wrap: nowrap.
+   Como cada um também tem white-space: nowrap, abaixo de ~360px eles não
+   encolhem sem que o texto vaze para fora da pílula. Aqui a quebra é liberada
+   e eles passam a ocupar duas linhas centradas. */
+@media (max-width: 400px) {
+  .hero-badges-grid {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 360px) {
+  /* Valores como "R$ 1.800,00" não cabem em duas colunas nesta largura e
+     quebram no meio. Uma coluna só mantém o número inteiro numa linha. */
+  .calc-results-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Evita que qualquer palavra longa force rolagem horizontal. */
+  .res-value,
+  .stat-number,
+  .section-title,
+  .hero-title {
+    overflow-wrap: break-word;
+  }
 }
