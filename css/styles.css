@@ -108,62 +108,25 @@ body {
 }
 
 /* Marca iGreenSol.
-   Na logo original o símbolo não é um ícone solto ao lado do texto: a folha fica
-   dentro do "G" e a rosca da lâmpada desce por baixo das letras, de modo que o
-   próprio "G" faz as vezes do bulbo. Por isso o SVG é sobreposto ao texto, e não
-   colocado antes dele.
+   A logo é a imagem enviada pelo Adilson, não uma recriação.
 
-   O verde-escuro do "reen" (#166534 no original) foi feito para fundo branco;
-   sobre o azul-petróleo do site ele quase some, então aqui é clareado. */
-:root {
-  --logo-i: #4ADE80;
-  --logo-g: #F97316;
-  --logo-reen: #22C55E;
-  --logo-sol: #F97316;
-  --logo-energy: #34D399;
-  --logo-leaf-a: #16A34A;
-  --logo-leaf-b: #4ADE80;
-  --logo-base: #22C55E;
+   São dois arquivos gerados a partir do mesmo PNG original:
+   - assets/logo.png       cores originais, para fundo claro
+   - assets/logo-dark.png  verdes escuros clareados, usado aqui
+
+   No arquivo original o "reen" e o "energy" são verde-escuro (#005424), feito
+   para fundo branco. Sobre o azul-petróleo do header o contraste é de 1,6:1,
+   ou seja, praticamente invisível. Na variante escura esses tons vão a 6,1:1. */
+.brand-img {
+  display: block;
+  height: 46px;
+  width: auto;
 }
 
-.brand-word {
-  display: inline-flex;
-  flex-direction: column;
-  line-height: 1;
-}
-
-/* Âncora do posicionamento da lâmpada. O padding inferior abre espaço para a
-   rosca, que desce abaixo da linha de base das letras. */
-.brand-name {
-  position: relative;
-  white-space: nowrap;
-  padding-bottom: 0.34em;
-}
-
-.brand-logo .brand-i     { color: var(--logo-i); }
-.brand-logo .brand-g     { color: var(--logo-g); }
-.brand-logo .brand-reen  { color: var(--logo-reen); }
-.brand-logo .brand-sol   { color: var(--logo-sol); }
-
-/* Medidas em em para a lâmpada acompanhar o tamanho da fonte da marca. */
-.brand-bulb {
-  position: absolute;
-  left: 0.30em;
-  top: 0.12em;
-  width: 0.78em;
-  height: 1.20em;
-  overflow: visible;
-  pointer-events: none;
-}
-
-/* "energy" alinhado à direita, sob o "Sol", como no desenho original. */
-.brand-logo .brand-energy {
-  color: var(--logo-energy);
-  align-self: flex-end;
-  font-size: 0.5em;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  margin-top: 0.1em;
+@media (max-width: 640px) {
+  .brand-img {
+    height: 36px;
+  }
 }
 
 /* Top button - CTA Primário */
