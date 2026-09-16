@@ -88,8 +88,9 @@ repositório, porta exposta **80**, e apontar o domínio desejado.
 
 ## Fluxo de conversão
 
-Os CTAs principais abrem o modal de cadastro em vez de mandar o visitante direto
-para fora do site. Ao enviar o formulário, os dados (nome, telefone, distribuidora
+O botão **Cadastrar** do topo leva direto ao cadastro no site do parceiro, para
+quem já chegou decidido. Os demais CTAs principais abrem o modal de cadastro em
+vez de mandar o visitante direto para fora do site. Ao enviar o formulário, os dados (nome, telefone, distribuidora
 e o valor simulado na calculadora) são montados numa mensagem e abertos no
 WhatsApp do consultor — o lead é capturado antes de qualquer redirecionamento.
 
@@ -137,6 +138,7 @@ Eventos já instrumentados:
 | `gerou_lead` | Envio do formulário, com distribuidora e valor da conta |
 | `clicou_whatsapp` | Clique direto em qualquer link `wa.me` |
 | `clicou_club` | Saída para o iGreen Club, que é um funil separado |
+| `clicou_cadastro_direto` | Saída direta ao cadastro sem passar pelo formulário |
 
 ## Acessibilidade
 

@@ -275,6 +275,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Saídas diretas para o cadastro no site do parceiro, sem passar pelo
+  // formulário. Só conta os links que realmente navegam: nos CTAs que abrem o
+  // modal o mesmo href existe apenas como fallback e o clique é interceptado.
+  document.querySelectorAll('a[href*="green.igreenenergy.com.br"]:not([data-open-modal])').forEach(el => {
+    el.addEventListener('click', () => {
+      track('clicou_cadastro_direto', { origem: el.id || 'sem-id' });
+    });
+  });
+
   /* ---------------------------------------------------------------
    * 6. Rolagem suave do CTA do hero até a calculadora
    * ------------------------------------------------------------- */
