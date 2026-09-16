@@ -119,13 +119,13 @@ body {
    ou seja, praticamente invisível. Na variante escura esses tons vão a 6,1:1. */
 .brand-img {
   display: block;
-  height: 46px;
+  height: 52px;
   width: auto;
 }
 
 @media (max-width: 640px) {
   .brand-img {
-    height: 36px;
+    height: 38px;
   }
 }
 
