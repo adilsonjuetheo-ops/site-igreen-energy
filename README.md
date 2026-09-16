@@ -3,7 +3,7 @@
 Landing page de captação para o programa de desconto na conta de energia da **iGreen Energy**.
 Site estático, sem build, sem dependências de framework.
 
-🔗 **Online:** https://adilsonjuetheo-ops.github.io/site-igreen-energy/
+🔗 **Online:** https://www.igreensol.com.br
 
 ---
 
@@ -72,8 +72,14 @@ python -m http.server 8080
 
 ## Deploy
 
+### Produção — VPS com Coolify
+`https://www.igreensol.com.br`, servido pelo container nginx, com certificado
+Let's Encrypt emitido pelo Coolify. Todo push na `main` dispara redeploy via
+webhook do GitHub.
+
 ### GitHub Pages
-Publicado automaticamente a partir da branch `main` (raiz do repositório).
+Espelho publicado a partir da branch `main`. As tags `canonical` apontam para o
+domínio próprio, então o espelho não concorre com ele nos buscadores.
 
 ### VPS com Coolify
 O projeto inclui `Dockerfile` baseado em `nginx:1.27-alpine`.
