@@ -1992,3 +1992,79 @@ body.modal-open {
     overflow-wrap: break-word;
   }
 }
+
+/* ===================================================================
+   BARRA FIXA DE CONVERSÃO (somente celular)
+   No desktop o CTA continua no header; no celular ele sai de lá e vira
+   esta barra, que fica sempre visível.
+   =================================================================== */
+
+/* Escondida por padrão: só existe abaixo de 640px. */
+.mobile-cta-bar {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .mobile-cta-bar {
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 96;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: rgba(11, 44, 57, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border-dark-subtle);
+  }
+
+  .mobile-cta-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 50px;
+    background: var(--brand-accent);
+    color: #0B2C39;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 800;
+    text-decoration: none;
+    border-radius: 12px;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+  }
+
+  .mobile-cta-btn:active {
+    transform: scale(0.99);
+  }
+
+  .mobile-cta-btn:focus-visible {
+    outline: 3px solid var(--text-white);
+    outline-offset: 3px;
+  }
+
+  /* O CTA do header sai de cena: a barra assume o papel dele. */
+  .btn-nav-cadastrar {
+    display: none !important;
+  }
+
+  /* Com o botão fora, a logo fica sozinha e pode respirar mais. */
+  .brand-img {
+    height: 42px;
+  }
+
+  /* A barra cobriria o fim da página; este espaço devolve a rolagem. */
+  body {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* WhatsApp e toast sobem para não ficarem atrás da barra. */
+  .floating-whatsapp {
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .toast-notice {
+    bottom: calc(146px + env(safe-area-inset-bottom, 0px));
+  }
+}
