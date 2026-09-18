@@ -18,10 +18,10 @@ accordion, depoimentos, modal de cadastro e integração com WhatsApp.
 | Seção | Descrição |
 |---|---|
 | Header | Navegação fixa com efeito no scroll e CTA de cadastro |
-| Hero | Ilustração SVG de painéis solares, título e CTAs principais |
+| Hero | Duas colunas no desktop: texto e CTA à esquerda, ilustração SVG à direita. Abaixo de 901px empilha na ordem selo → ilustração → texto |
 | Benefícios | Faixa com os 7 diferenciais do serviço |
 | Como funciona | Os 3 passos do processo de adesão |
-| Calculadora | Simulador de economia mensal e anual (15% de desconto) |
+| Calculadora | Simulador de economia mensal e anual (15% de desconto), com campo, slider e valores rápidos sincronizados |
 | Garantia | Bloco de segurança e confiança |
 | Vantagens | Cards com os diferenciais, incluindo o iGreen Club |
 | Estatísticas | Faixa com números e resultados |
@@ -29,7 +29,8 @@ accordion, depoimentos, modal de cadastro e integração com WhatsApp.
 | FAQ | Perguntas frequentes em accordion |
 | CTA final | Chamada de conversão com botões de ação |
 | Rodapé | Contatos e suporte via WhatsApp |
-| Flutuantes | Botão de WhatsApp, modal de cadastro e toast de confirmação |
+| Flutuantes | Botão de WhatsApp (só no desktop), modal de cadastro e toast de confirmação |
+| Barra fixa (celular) | Abaixo de 640px, WhatsApp e Cadastrar na mesma barra — o flutuante sai de cena para não haver dois elementos fixos no mesmo canto |
 
 ## Estrutura
 
@@ -60,6 +61,17 @@ Tema escuro em azul-petróleo com acentos em verde.
 | `--gold` | `#D97706` | Botão de destaque no CTA final |
 
 Tipografia: **Plus Jakarta Sans** (Google Fonts).
+
+Além das cores, o topo de `css/styles.css` define tokens de acabamento. Use-os
+em vez de escrever valores soltos, senão a escala volta a se espalhar:
+
+| Grupo | Tokens | Uso |
+|---|---|---|
+| Raio | `--radius-sm` (12px), `--radius-md` (18px), `--radius-lg` (24px) | Pílulas e chips / cards / blocos grandes |
+| Sombra escura | `--shadow-sm`, `--shadow-md`, `--shadow-lg` | Duas camadas cada: uma rasa que assenta, uma profunda que afasta |
+| Sombra clara | `--shadow-light-sm`, `--shadow-light-md` | Mesmo papel nos blocos `#F7F9F8` |
+| Brilho | `--glow-accent`, `--glow-accent-strong` | Halo verde dos CTAs primários |
+| Superfície | `--sheen-dark` | Verniz de luz no topo dos cards escuros |
 
 ## Rodar localmente
 
@@ -140,7 +152,7 @@ Eventos já instrumentados:
 
 | Evento | Quando dispara |
 |---|---|
-| `usou_calculadora` | Primeira digitação na calculadora (uma vez por visita) |
+| `usou_calculadora` | Primeiro uso da calculadora, pelo campo ou pelo slider (uma vez por visita) |
 | `abriu_formulario` | Clique num CTA que abre o modal, com o id de origem |
 | `gerou_lead` | Envio do formulário, com distribuidora e valor da conta |
 | `clicou_whatsapp` | Clique direto em qualquer link `wa.me` |
@@ -156,8 +168,8 @@ Eventos já instrumentados:
 isso as duas páginas HTML referenciam esses arquivos com um parâmetro de versão:
 
 ```html
-<link rel="stylesheet" href="css/styles.css?v=2026091501">
-<script src="js/main.js?v=2026091501"></script>
+<link rel="stylesheet" href="css/styles.css?v=2026091701">
+<script src="js/main.js?v=2026091701"></script>
 ```
 
 **Ao alterar qualquer coisa em `css/` ou `js/`, incremente esse `?v=` nas duas
@@ -169,5 +181,12 @@ deixá-lo desatualizado.
 
 - Modal com focus trap, retorno de foco ao elemento que o abriu e bloqueio da
   rolagem de fundo; fecha com `Esc` ou clique no fundo.
+- Cuidado ao mexer em `.modal-close`: as transições dele precisam nomear as
+  propriedades. Com `transition: all`, a mudança de `visibility` herdada do
+  backdrop ao abrir também entra em transição, o `focus()` inicial encontra o
+  botão ainda invisível, o foco cai no `body` e o trap deixa de valer.
+- O slider da calculadora é um atalho redundante ao campo numérico, então fica
+  fora da ordem de tabulação (`tabindex="-1"` + `aria-hidden`): quem usa teclado
+  ou leitor de tela chega ao mesmo valor pelo campo, sem um controle duplicado.
 - Estados de foco visíveis em todos os elementos interativos (`:focus-visible`).
 - Animações de entrada respeitam `prefers-reduced-motion`.

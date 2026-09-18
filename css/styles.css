@@ -28,6 +28,32 @@
   --border-emerald: rgba(46, 158, 122, 0.35);
 
   --gold: #D97706;
+
+  /* Raios. A escala antiga ia de 10 a 16px e deixava tudo com cara de caixa;
+     estes valores dão o arredondamento mais generoso do acabamento atual. */
+  --radius-sm: 12px;    /* pílulas de benefício, chips */
+  --radius-md: 18px;    /* cards em geral */
+  --radius-lg: 24px;    /* blocos grandes: calculadora, banner do hero, modal */
+
+  /* Sombras em camadas: uma rasa que assenta o objeto na superfície e uma
+     profunda que dá a distância. Aplicar as duas juntas é o que separa o
+     relevo de verdade do "border-box com um blur". */
+  --shadow-sm: 0 1px 2px rgba(6, 24, 30, 0.28), 0 2px 8px rgba(6, 24, 30, 0.22);
+  --shadow-md: 0 2px 4px rgba(6, 24, 30, 0.30), 0 8px 24px rgba(6, 24, 30, 0.34);
+  --shadow-lg: 0 4px 8px rgba(6, 24, 30, 0.32), 0 18px 48px rgba(6, 24, 30, 0.46);
+
+  /* Sombras para o bloco claro, onde o azul-petróleo entra bem mais suave. */
+  --shadow-light-sm: 0 1px 2px rgba(15, 61, 76, 0.06), 0 2px 8px rgba(15, 61, 76, 0.06);
+  --shadow-light-md: 0 2px 4px rgba(15, 61, 76, 0.07), 0 12px 28px rgba(15, 61, 76, 0.10);
+
+  /* Halo verde dos CTAs primários. */
+  --glow-accent: 0 0 0 1px rgba(34, 197, 94, 0.35), 0 6px 18px rgba(34, 197, 94, 0.28);
+  --glow-accent-strong: 0 0 0 1px rgba(34, 197, 94, 0.5), 0 10px 30px rgba(34, 197, 94, 0.42);
+
+  /* Verniz de luz no topo dos cards escuros: o mesmo truque de superfície que
+     os cards chapados não tinham. */
+  --sheen-dark: linear-gradient(160deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.015) 38%, rgba(255, 255, 255, 0) 70%);
+
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
@@ -160,20 +186,83 @@ body {
   outline-offset: 2px;
 }
 
+/* -------------------------------------------------------------------
+   Composição do hero
+   No celular é uma coluna só, na ordem selo -> ilustração -> texto.
+   A partir de 901px vira duas colunas: o texto e o CTA à esquerda, a
+   ilustração à direita. O motivo é a dobra — empilhado, a arte comia os
+   primeiros 470px da tela e empurrava o H1 para 649px e o CTA para 839px,
+   ou seja, para fora da primeira tela de um notebook 1366x768.
+   ------------------------------------------------------------------- */
+.hero-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "badge"
+    "visual"
+    "copy";
+}
+
+.hero-top-badge-wrap { grid-area: badge; }
+.hero-banner-wrapper { grid-area: visual; }
+.hero-copy           { grid-area: copy; }
+
+@media (min-width: 901px) {
+  .hero-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.04fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "badge  visual"
+      "copy   visual";
+    align-items: start;
+    gap: 0 clamp(28px, 4vw, 56px);
+    text-align: left;
+  }
+
+  /* A ilustração ocupa as duas linhas da direita e se centra na altura do
+     bloco de texto, que é sempre o mais alto dos dois. */
+  .hero-banner-wrapper {
+    align-self: center;
+  }
+
+  .hero-layout .hero-top-badge-wrap {
+    justify-content: flex-start;
+  }
+
+  /* Sem o auto das margens, o texto encosta na borda esquerda da coluna. */
+  .hero-title,
+  .hero-subtitle {
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 100%;
+  }
+
+  .hero-layout .hero-badges-grid {
+    justify-content: flex-start;
+  }
+}
+
 /* Hero Section Visual Banner & Hero Styles */
 .hero-banner-wrapper {
   margin: 0 auto clamp(20px, 3.5vw, 32px);
   max-width: 1040px;
+  width: 100%;
   position: relative;
+}
+
+@media (min-width: 901px) {
+  .hero-banner-wrapper {
+    margin-bottom: 0;
+  }
 }
 
 .hero-banner-card {
   position: relative;
   width: 100%;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid var(--border-emerald);
-  box-shadow: 0 16px 36px rgba(7, 30, 38, 0.5), 0 4px 12px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow-lg);
   background: #0B2C39;
   line-height: 0;
 }
@@ -236,13 +325,14 @@ body {
 }
 
 .hero-title {
-  font-size: clamp(1.75rem, 3.8vw, 2.65rem);
-  line-height: 1.16;
+  font-size: clamp(1.85rem, 4.4vw, 3.15rem);
+  line-height: 1.1;
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
   color: var(--text-white);
   max-width: 780px;
-  margin: 0 auto 14px;
+  margin: 0 auto 16px;
+  text-wrap: balance;
 }
 
 .hero-title .text-green {
@@ -251,12 +341,13 @@ body {
 }
 
 .hero-subtitle {
-  font-size: clamp(0.92rem, 1.6vw, 1.05rem);
-  line-height: 1.6;
+  font-size: clamp(0.95rem, 1.6vw, 1.12rem);
+  line-height: 1.65;
   color: var(--text-gray);
   max-width: 660px;
-  margin: 0 auto 24px;
+  margin: 0 auto 28px;
   font-weight: 400;
+  text-wrap: pretty;
 }
 
 /* Primary CTA button */
@@ -271,9 +362,9 @@ body {
   min-height: 46px;
   font-size: 0.96rem;
   font-weight: 800;
-  border-radius: 10px;
+  border-radius: 14px;
   text-decoration: none;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28), 0 2px 6px rgba(34, 197, 94, 0.2);
+  box-shadow: var(--shadow-md), var(--glow-accent);
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
   cursor: pointer;
   border: 1px solid var(--brand-accent);
@@ -290,12 +381,23 @@ body {
   color: #FFFFFF !important;
   border-color: var(--brand-accent-hover);
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35), 0 3px 8px rgba(34, 197, 94, 0.3);
+  box-shadow: var(--shadow-lg), var(--glow-accent-strong);
 }
 
 .cta-btn-primary:focus-visible {
   outline: 2px solid var(--brand-accent);
   outline-offset: 2px;
+}
+
+.hero-cta-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+@media (min-width: 901px) {
+  .hero-layout .hero-cta-wrap {
+    justify-content: flex-start;
+  }
 }
 
 .hero-badges-grid {
@@ -363,13 +465,46 @@ body {
   gap: 10px;
 }
 
+/* São 7 itens, número que não fecha linha em nenhuma grade regular. Em vez de
+   deixar o auto-fit resolver (5 + 2, com metade da segunda linha vazia), as
+   duas faixas abaixo distribuem 4 + 3 e 3 + 3 + 1 centralizado, em colunas
+   fracionárias que sempre fecham a linha inteira. */
+@media (min-width: 1024px) {
+  .benefits-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .benefit-item {
+    grid-column: span 3;   /* 4 por linha */
+  }
+
+  .benefit-item:nth-child(n + 5) {
+    grid-column: span 4;   /* 3 por linha */
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  .benefits-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .benefit-item {
+    grid-column: span 2;   /* 3 por linha */
+  }
+
+  .benefit-item:last-child {
+    grid-column: 3 / span 2;  /* sobra sozinho: fica no meio */
+  }
+}
+
 .benefit-item {
   display: flex;
   align-items: center;
   gap: 11px;
-  padding: 11px 15px;
-  background: var(--bg-dark-surface);
-  border-radius: 10px;
+  padding: 13px 16px;
+  background-color: var(--bg-dark-surface);
+  background-image: var(--sheen-dark);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border-dark-subtle);
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -424,12 +559,13 @@ body {
 }
 
 .section-title {
-  font-size: clamp(1.45rem, 2.6vw, 1.95rem);
+  font-size: clamp(1.5rem, 3.1vw, 2.2rem);
   font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: -0.03em;
   color: var(--text-white);
-  letter-spacing: -0.025em;
-  margin: 0 0 10px;
-  line-height: 1.22;
+  margin: 0 0 12px;
+  text-wrap: balance;
 }
 
 .section-desc {
@@ -454,11 +590,12 @@ body {
 }
 
 .step-card {
-  background: var(--bg-dark-card);
-  border-radius: 14px;
-  padding: 22px 20px;
+  background-color: var(--bg-dark-card);
+  background-image: var(--sheen-dark);
+  border-radius: var(--radius-md);
+  padding: 26px 24px;
   border: 1px solid var(--border-dark-card);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+  box-shadow: var(--shadow-sm);
   position: relative;
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
   display: flex;
@@ -467,7 +604,7 @@ body {
 
 .step-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow-md);
   border-color: rgba(34, 197, 94, 0.4);
 }
 
@@ -477,13 +614,13 @@ body {
   color: var(--brand-accent);
   background: rgba(11, 110, 79, 0.35);
   border: 1px solid rgba(46, 158, 122, 0.45);
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
-  margin-bottom: 14px;
+  border-radius: 14px;
+  margin-bottom: 16px;
 }
 
 .step-title {
@@ -531,11 +668,12 @@ body {
 }
 
 .calculator-box {
-  background: var(--bg-dark-surface);
-  border-radius: 18px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  background-color: var(--bg-dark-surface);
+  background-image: var(--sheen-dark);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   border: 1px solid var(--border-emerald);
-  padding: clamp(20px, 3.5vw, 32px);
+  padding: clamp(22px, 3.5vw, 36px);
   max-width: 800px;
   margin: 0 auto;
   position: relative;
@@ -543,7 +681,7 @@ body {
 
 .calc-input-wrapper {
   max-width: 440px;
-  margin: 0 auto 20px;
+  margin: 0 auto 14px;
 }
 
 .calc-label {
@@ -581,7 +719,7 @@ body {
   color: var(--text-white);
   background-color: var(--bg-dark-deep);
   border: 1.5px solid var(--border-dark-card);
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   box-sizing: border-box;
   transition: all 0.2s ease;
   font-family: inherit;
@@ -643,19 +781,131 @@ body {
   box-shadow: 0 2px 8px rgba(34, 197, 94, 0.25);
 }
 
+/* -------------------------------------------------------------------
+   Slider da calculadora
+   Arrastar é mais convidativo do que digitar, e o valor exato continua
+   disponível no campo acima. Os dois ficam sempre sincronizados.
+   O trilho é pintado por --fill (0 a 100), que o JS atualiza a cada
+   mudança, para que a parte já percorrida apareça em verde.
+   ------------------------------------------------------------------- */
+.calc-slider-wrapper {
+  max-width: 440px;
+  margin: 0 auto 22px;
+}
+
+.calc-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 26px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  display: block;
+}
+
+/* WebKit e Firefox não aceitam os dois seletores de trilho na mesma regra:
+   um seletor desconhecido invalida o bloco inteiro. Por isso vão separados. */
+.calc-slider::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: linear-gradient(
+    to right,
+    var(--brand-accent) 0%,
+    var(--brand-accent) calc(var(--fill, 5%) ),
+    var(--bg-dark-deep) calc(var(--fill, 5%) ),
+    var(--bg-dark-deep) 100%
+  );
+  border: 1px solid var(--border-dark-card);
+}
+
+.calc-slider::-moz-range-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--bg-dark-deep);
+  border: 1px solid var(--border-dark-card);
+}
+
+.calc-slider::-moz-range-progress {
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--brand-accent);
+}
+
+.calc-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  margin-top: -9px;   /* centra o polegar de 24px no trilho de 8px */
+  border-radius: 50%;
+  background: var(--brand-accent);
+  border: 3px solid #0B2C39;
+  box-shadow: var(--glow-accent);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.calc-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--brand-accent);
+  border: 3px solid #0B2C39;
+  box-shadow: var(--glow-accent);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.calc-slider:hover::-webkit-slider-thumb,
+.calc-slider:active::-webkit-slider-thumb {
+  transform: scale(1.12);
+  box-shadow: var(--glow-accent-strong);
+}
+
+.calc-slider:hover::-moz-range-thumb,
+.calc-slider:active::-moz-range-thumb {
+  transform: scale(1.12);
+  box-shadow: var(--glow-accent-strong);
+}
+
+.calc-slider-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
 /* Result Cards */
+/* Antes eram 4 cartões de peso igual e o número que decide a venda — a
+   economia mensal — se perdia entre eles. Agora ele toma a linha inteira e
+   os outros dois entram abaixo, como contexto. */
 .calc-results-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 22px;
+}
+
+.res-card.res-primary {
+  grid-column: 1 / -1;
+  padding: clamp(20px, 3vw, 28px) 16px;
+}
+
+.res-foot {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-gray);
+  margin-top: 8px;
 }
 
 .res-card {
-  background: var(--bg-dark-card);
+  background-color: var(--bg-dark-card);
+  background-image: var(--sheen-dark);
   border: 1px solid var(--border-dark-card);
-  border-radius: 12px;
-  padding: 16px 12px;
+  border-radius: var(--radius-md);
+  padding: 18px 14px;
   text-align: center;
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   display: flex;
@@ -663,15 +913,16 @@ body {
   justify-content: center;
 }
 
-.res-card.highlight-card {
-  background: rgba(11, 110, 79, 0.22);
-  border-color: var(--border-emerald);
+.res-card.res-primary {
+  background-color: rgba(11, 110, 79, 0.28);
+  border-color: rgba(34, 197, 94, 0.45);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), var(--shadow-md);
 }
 
 .res-card:hover {
   transform: translateY(-2px);
   border-color: rgba(34, 197, 94, 0.4);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-md);
 }
 
 .res-label {
@@ -691,22 +942,31 @@ body {
   line-height: 1.2;
 }
 
+.res-primary .res-value {
+  font-size: clamp(2.1rem, 5.2vw, 3.1rem);
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
 .res-value.green {
   color: var(--brand-accent);
 }
 
+/* Era um cartão de resultado inteiro para uma informação que não é resultado,
+   e a pílula ainda quebrava em duas linhas dentro dele. Virou nota discreta
+   embaixo do CTA. */
 .res-badge-status {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   font-size: 0.8rem;
   font-weight: 700;
   color: var(--brand-accent);
   background: rgba(11, 110, 79, 0.25);
   border: 1px solid rgba(46, 158, 122, 0.35);
-  padding: 4px 10px;
+  padding: 5px 12px;
   border-radius: 9999px;
-  margin: 0 auto;
+  white-space: nowrap;
 }
 
 .status-dot {
@@ -718,7 +978,14 @@ body {
 }
 
 .calc-cta-wrap {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.calc-cta-wrap .cta-btn-primary {
+  min-width: 240px;
 }
 
 /* Diferenciais — Bloco de leitura clara (#F7F9F8) */
@@ -749,25 +1016,25 @@ body {
 .feature-card {
   background: var(--bg-light-card);
   border: 1px solid var(--border-light);
-  border-radius: 14px;
-  padding: 22px 20px;
+  border-radius: var(--radius-md);
+  padding: 26px 24px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-  box-shadow: 0 2px 8px rgba(15, 61, 76, 0.05);
+  box-shadow: var(--shadow-light-sm);
 }
 
 .feature-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(15, 61, 76, 0.12);
+  box-shadow: var(--shadow-light-md);
   border-color: var(--brand-primary);
 }
 
 .feature-icon-wrap {
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
   background: rgba(11, 110, 79, 0.08);
   border: 1px solid rgba(11, 110, 79, 0.2);
   color: var(--brand-primary);
@@ -879,11 +1146,12 @@ body {
 }
 
 .testimonial-card {
-  background: var(--bg-dark-card);
+  background-color: var(--bg-dark-card);
+  background-image: var(--sheen-dark);
   border: 1px solid var(--border-dark-card);
-  border-radius: 14px;
-  padding: 22px 20px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-md);
+  padding: 24px 22px;
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -893,7 +1161,7 @@ body {
 .testimonial-card:hover {
   transform: translateY(-3px);
   border-color: rgba(34, 197, 94, 0.4);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow-md);
 }
 
 .test-stars {
@@ -904,17 +1172,42 @@ body {
 }
 
 .test-text {
-  font-size: 0.88rem;
-  line-height: 1.6;
+  font-size: 0.94rem;
+  line-height: 1.65;
   color: var(--text-gray);
-  font-style: italic;
-  margin: 0 0 16px;
+  margin: 0 0 18px;
   flex-grow: 1;
 }
 
 .test-author-info {
   border-top: 1px solid var(--border-dark-subtle);
-  padding-top: 14px;
+  padding-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Iniciais no lugar de foto: prova social ganha rosto sem inventar uma
+   pessoa que não existe nem carregar mais três imagens. */
+.test-avatar {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #0B2C39;
+  background: linear-gradient(145deg, var(--brand-light-green), var(--brand-accent));
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: var(--shadow-sm);
+}
+
+.test-author-meta {
+  min-width: 0;
 }
 
 .test-name {
@@ -931,8 +1224,8 @@ body {
   color: #FFFFFF;
   background: rgba(11, 110, 79, 0.35);
   border: 1px solid rgba(46, 158, 122, 0.45);
-  padding: 3px 9px;
-  border-radius: 6px;
+  padding: 3px 10px;
+  border-radius: 9999px;
 }
 
 /* FAQ — Bloco de leitura clara (#F7F9F8) */
@@ -961,11 +1254,11 @@ body {
 
 .faq-item {
   border: 1px solid var(--border-light);
-  border-radius: 11px;
+  border-radius: var(--radius-sm);
   margin-bottom: 10px;
   overflow: hidden;
   background: var(--bg-light-card);
-  box-shadow: 0 2px 6px rgba(15, 61, 76, 0.04);
+  box-shadow: var(--shadow-light-sm);
   transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -1075,12 +1368,12 @@ body {
   font-weight: 800;
   padding: 12px 24px;
   min-height: 46px;
-  border-radius: 10px;
+  border-radius: 14px;
   text-decoration: none;
   font-size: 0.95rem;
   border: 1px solid var(--brand-accent);
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), 0 2px 6px rgba(34, 197, 94, 0.2);
+  box-shadow: var(--shadow-md), var(--glow-accent);
   transition: all 0.2s ease;
   letter-spacing: -0.01em;
 }
@@ -1350,15 +1643,16 @@ a.final-badge:hover {
 }
 
 .modal-window {
-  background: var(--bg-dark-surface);
-  border-radius: 16px;
+  background-color: var(--bg-dark-surface);
+  background-image: var(--sheen-dark);
+  border-radius: var(--radius-lg);
   max-width: 440px;
   width: 100%;
   padding: 24px 22px;
   position: relative;
   transform: scale(0.95);
   transition: transform 0.25s ease;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-lg);
   border: 1px solid var(--border-emerald);
 }
 
@@ -1414,10 +1708,10 @@ a.final-badge:hover {
     aspect-ratio: 16 / 9.5;
   }
   .hero-banner-wrapper {
-    margin: 0 auto 20px;
+    margin: 0 auto 22px;
   }
   .hero-banner-card {
-    border-radius: 12px;
+    border-radius: var(--radius-md);
   }
   .shell-container {
     padding: 0 16px;
@@ -1742,12 +2036,6 @@ body.modal-open {
   }
 }
 
-@media (min-width: 641px) and (max-width: 900px) {
-  .benefits-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 /* Alvos de toque confortáveis no celular (mínimo de 44px). */
 @media (max-width: 640px) {
   .chip-btn,
@@ -2010,7 +2298,9 @@ body.modal-open {
 
 @media (max-width: 640px) {
   .mobile-cta-bar {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     position: fixed;
     left: 0;
     right: 0;
@@ -2023,12 +2313,14 @@ body.modal-open {
     border-top: 1px solid var(--border-dark-subtle);
   }
 
+  /* A conversão fica com todo o espaço que sobra da barra. */
   .mobile-cta-btn {
+    flex: 1 1 auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    min-height: 50px;
+    min-width: 0;
+    min-height: 52px;
     background: var(--brand-accent);
     color: #0B2C39;
     font-family: inherit;
@@ -2048,6 +2340,31 @@ body.modal-open {
     outline-offset: 3px;
   }
 
+  /* Ação secundária: presente, mas sem competir com o Cadastrar. */
+  .mobile-cta-wa {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    color: var(--brand-accent);
+    background: rgba(34, 197, 94, 0.14);
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    text-decoration: none;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+  }
+
+  .mobile-cta-wa:active {
+    transform: scale(0.96);
+  }
+
+  .mobile-cta-wa:focus-visible {
+    outline: 3px solid var(--text-white);
+    outline-offset: 3px;
+  }
+
   /* O CTA do header sai de cena: a barra assume o papel dele. */
   .btn-nav-cadastrar {
     display: none !important;
@@ -2060,16 +2377,19 @@ body.modal-open {
 
   /* A barra cobriria o fim da página; este espaço devolve a rolagem. */
   body {
-    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px));
   }
 
-  /* WhatsApp e toast sobem para não ficarem atrás da barra. */
+  /* O flutuante era um segundo elemento fixo no mesmo canto: cobria o
+     conteúdo durante a rolagem e colocava duas decisões concorrentes sob o
+     polegar. No celular ele sai, e quem assume o papel é .mobile-cta-wa,
+     dentro da própria barra. */
   .floating-whatsapp {
-    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+    display: none;
   }
 
   .toast-notice {
-    bottom: calc(146px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -2085,7 +2405,7 @@ body.modal-open {
   padding: 20px 24px;
   background: rgba(37, 211, 102, 0.08);
   border: 1px solid rgba(37, 211, 102, 0.3);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   text-align: left;
 }
 
@@ -2175,10 +2495,10 @@ body.modal-open {
 .video-frame {
   max-width: 880px;
   margin: 0 auto;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid var(--border-emerald);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow-lg);
   /* Reserva a altura antes do vídeo carregar, para a página não "pular". */
   aspect-ratio: 16 / 9;
   background: #06181E;

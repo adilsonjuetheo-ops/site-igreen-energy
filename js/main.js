@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
    * 1. Calculadora Interativa
    * ------------------------------------------------------------- */
   const billInput = document.getElementById('bill-input');
+  const billSlider = document.getElementById('bill-slider');
   const resMonth = document.getElementById('res-month');
   const resYear = document.getElementById('res-year');
   const chipButtons = document.querySelectorAll('.chip-btn');
@@ -63,9 +64,26 @@ document.addEventListener('DOMContentLoaded', () => {
     return isNaN(raw) || raw < 0 ? 0 : raw;
   }
 
+  // Deixa o slider refletindo o valor do campo. O campo aceita qualquer número;
+  // o slider tem um teto, então acima dele ele simplesmente encosta no fim —
+  // sem alterar o valor informado, que continua valendo para o cálculo.
+  function syncSlider(value) {
+    if (!billSlider) return;
+
+    const min = parseFloat(billSlider.min);
+    const max = parseFloat(billSlider.max);
+    const clamped = Math.min(Math.max(value, min), max);
+
+    billSlider.value = clamped;
+    // Pinta o trecho já percorrido do trilho (ver --fill em styles.css).
+    billSlider.style.setProperty('--fill', ((clamped - min) / (max - min)) * 100 + '%');
+  }
+
   function updateCalculation() {
     const value = currentBillValue();
     const monthlyDiscount = value * DISCOUNT_RATE;
+
+    syncSlider(value);
 
     resMonth.textContent = formatBRL(monthlyDiscount);
     resYear.textContent = formatBRL(monthlyDiscount * 12);
@@ -93,6 +111,17 @@ document.addEventListener('DOMContentLoaded', () => {
       track('usou_calculadora');
     }
   });
+
+  if (billSlider) {
+    billSlider.addEventListener('input', () => {
+      billInput.value = billSlider.value;
+      updateCalculation();
+      if (!calcTracked) {
+        calcTracked = true;
+        track('usou_calculadora');
+      }
+    });
+  }
 
   chipButtons.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -361,5 +390,49 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
 
     revealEls.forEach(el => observer.observe(el));
+  }
+
+  /* ---------------------------------------------------------------
+   * 8. Contagem dos números da faixa de estatísticas
+   *
+   * O texto final já está no HTML, então sem JS — ou sob
+   * prefers-reduced-motion — a faixa aparece exatamente como hoje.
+   * A animação só entra quando a seção chega na tela, e cada número
+   * conta uma vez só.
+   * ------------------------------------------------------------- */
+  const counters = document.querySelectorAll('[data-count]');
+
+  if (counters.length && !prefersReducedMotion && 'IntersectionObserver' in window) {
+    function runCounter(el) {
+      const target = parseFloat(el.getAttribute('data-count'));
+      if (isNaN(target)) return;
+
+      const prefix = el.getAttribute('data-prefix') || '';
+      const suffix = el.getAttribute('data-suffix') || '';
+      const duration = 1100;
+      const start = performance.now();
+
+      function frame(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        // easeOutCubic: arranca rápido e assenta no valor final sem freada seca.
+        const eased = 1 - Math.pow(1 - progress, 3);
+
+        el.innerHTML = prefix + Math.round(eased * target).toLocaleString('pt-BR') + suffix;
+
+        if (progress < 1) requestAnimationFrame(frame);
+      }
+
+      requestAnimationFrame(frame);
+    }
+
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        counterObserver.unobserve(entry.target);
+        runCounter(entry.target);
+      });
+    }, { threshold: 0.5 });
+
+    counters.forEach(el => counterObserver.observe(el));
   }
 });
