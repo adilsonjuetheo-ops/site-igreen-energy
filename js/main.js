@@ -164,6 +164,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Impede que o fundo role enquanto o modal está aberto.
     document.body.classList.add('modal-open');
 
+    // Fechado, o modal tem visibility: hidden, e focus() é ignorado em elemento
+    // invisível. Adicionar a classe não recalcula o estilo na hora, então sem
+    // esta leitura — que força o recálculo — o foco caía no body e o teclado
+    // começava a navegação fora do modal. requestAnimationFrame não resolve:
+    // o callback ainda roda antes do recálculo de estilo do quadro.
+    void modal.offsetHeight;
+
     const first = modal.querySelector(FOCUSABLE);
     if (first) first.focus();
   }

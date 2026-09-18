@@ -1381,7 +1381,11 @@ a.final-badge:hover {
   font-size: 1.25rem;
   color: var(--text-gray);
   cursor: pointer;
-  transition: all 0.2s ease;
+  /* Propriedades nomeadas, não "all": com "all" a mudança de visibility herdada
+     do backdrop ao abrir o modal também entrava em transição, e no instante do
+     focus() o botão ainda contava como invisível — o foco caía no body e a
+     navegação por teclado começava fora do modal. */
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 .modal-close:hover {
